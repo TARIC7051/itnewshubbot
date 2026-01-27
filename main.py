@@ -6,16 +6,11 @@ from aiogram.utils import executor
 from config import BOT_TOKEN
 from news import get_all_news
 
-# ----------------- логирование -----------------
-
 logging.basicConfig(level=logging.INFO)
-
-# ----------------- бот -----------------
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(bot)
 
-# ----------------- handlers -----------------
 
 @dp.message_handler(commands=["start"])
 async def cmd_start(message: types.Message):
@@ -36,8 +31,6 @@ async def cmd_news(message: types.Message):
     for item in news_list:
         await message.answer(item)
 
-
-# ----------------- run -----------------
 
 if __name__ == "__main__":
     executor.start_polling(dp, skip_updates=True)
