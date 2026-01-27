@@ -1,64 +1,43 @@
-# main.py
-
-import os
 import logging
-from aiogram import Bot, Dispatcher, types
-from aiogram.utils.executor import start_webhook
 
-from config import BOT_TOKEN, WEBHOOK_URL, WEBHOOK_PATH
+from aiogram import Bot, Dispatcher, types
+from aiogram.utils import executor
+
+from config import BOT_TOKEN
 from news import get_all_news
 
-# логирование
+# ----------------- логирование -----------------
+
 logging.basicConfig(level=logging.INFO)
+
+# ----------------- бот -----------------
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(bot)
 
-
-# ---------- обработчики команд ----------
+# ----------------- handlers -----------------
 
 @dp.message_handler(commands=["start"])
 async def cmd_start(message: types.Message):
     await message.answer(
         "ITNewsHubBot запущен.\n"
-        "Скоро здесь будут новости IT-индустрии.\n"
-        "Используй команду /news для последних новостей."
+        "Команда /news — последние IT-новости."
     )
 
 
 @dp.message_handler(commands=["news"])
 async def cmd_news(message: types.Message):
     news_list = get_all_news(limit=5)
+
     if not news_list:
-        await message.answer("Не удалось получить новости, попробуйте позже.")
+        await message.answer("Не удалось получить новости.")
         return
 
-    for news_item in news_list:
-        await message.answer(news_item)
+    for item in news_list:
+        await message.answer(item)
 
 
-# ---------- webhook функции ----------
-
-async def on_startup(dispatcher):
-    await bot.set_webhook(WEBHOOK_URL)
-    logging.info(f"Webhook установлен: {WEBHOOK_URL}")
-
-
-async def on_shutdown(dispatcher):
-    await bot.delete_webhook()
-    logging.info("Webhook удалён")
-
-
-# ---------- запуск ----------
+# ----------------- run -----------------
 
 if __name__ == "__main__":
-    start_webhook(
-        dispatcher=dp,
-        webhook_path=WEBHOOK_PATH,
-        on_startup=on_startup,
-        on_shutdown=on_shutdown,
-        skip_updates=True,
-        host="0.0.0.0",
-        port=int(os.environ.get("PORT", 8080))
-    )
-
+    executor.start_polling(dp, skip_updates=True)
