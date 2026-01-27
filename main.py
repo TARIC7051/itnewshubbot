@@ -1,5 +1,6 @@
 # main.py
 
+import os
 import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram.utils.executor import start_webhook
@@ -58,5 +59,6 @@ if __name__ == "__main__":
         on_shutdown=on_shutdown,
         skip_updates=True,
         host="0.0.0.0",
-        port=8000
+        port=int(os.environ.get("PORT", 8080))
     )
+
