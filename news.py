@@ -13,11 +13,12 @@ DEFAULT_HEADERS = {
 }
 
 
-def fetch_feed(url, source_name, headers=None, relaxed=False):
+def fetch_feed(url, source_name, headers=None, relaxed=False, timeout=None):
     request_headers = headers or {}
+    request_timeout = timeout or FEED_TIMEOUT
     try:
         response = requests.get(url,
-                                timeout=FEED_TIMEOUT,
+                                timeout=request_timeout,
                                 headers=request_headers)
         response.raise_for_status()
     except requests.RequestException as exc:
@@ -29,6 +30,14 @@ def fetch_feed(url, source_name, headers=None, relaxed=False):
         parse_kwargs["sanitize_html"] = True
 
     feed = feedparser.parse(response.content, **parse_kwargs)
+    if feed.bozo and relaxed:
+        try:
+            decoded_content = response.content.decode(
+                response.encoding or "utf-8",
+                errors="replace")
+            feed = feedparser.parse(decoded_content, **parse_kwargs)
+        except Exception as exc:
+            logging.error(f"Ошибка {source_name}: {exc}")
     if feed.bozo and getattr(feed, "bozo_exception", None):
         logging.error(f"Ошибка {source_name}: {feed.bozo_exception}")
         return None
@@ -140,7 +149,8 @@ def get_theverge_news():
 # --- TechCrunch ---
 def get_techcrunch_news():
     feed = fetch_feed("https://feeds.feedburner.com/TechCrunch/",
-                      "TechCrunch")
+                      "TechCrunch",
+                      timeout=20)
     if not feed:
         return []
 
