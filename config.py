@@ -1,3 +1,4 @@
 import os
 
-API_TOKEN = os.getenv("API_TOKEN")
+# Токен бота берётся из переменных окружения
+API_TOKEN = os.environ.get("BOT_TOKEN", "")
