@@ -1,8 +1,0 @@
-app = "itnewshubbot"
-primary_region = "ams"
-
-[build]
-  dockerfile = "Dockerfile"
-
-[processes]
-  bot = "python main.py"
