@@ -1,6 +1,5 @@
 aiogram==2.25.1
 aiohttp
-aiogram==2.25.1
 beautifulsoup4
-requests
 feedparser
+requests
