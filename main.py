@@ -1,35 +1,146 @@
 import logging
-
 from aiogram import Bot, Dispatcher, types
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils import executor
-
-from config import BOT_TOKEN
-from news import get_all_news
+from config import API_TOKEN
+from news import (get_3dnews_news, get_habr_news, get_hackernews,
+                  get_theverge_news, get_techcrunch_news, get_slashdot_news,
+                  get_stopgame_news, get_igromania_news)
 
 logging.basicConfig(level=logging.INFO)
 
-bot = Bot(token=BOT_TOKEN)
+bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
+user_data = {}  # новости и индекс для каждого пользователя
 
-@dp.message_handler(commands=["start"])
+
+# --- Кнопки главного меню ---
+def main_menu_keyboard():
+    kb = ReplyKeyboardMarkup(resize_keyboard=True)
+    kb.add(KeyboardButton("Игры"))
+    kb.add(KeyboardButton("IT"))
+    kb.add(KeyboardButton("Наука"))
+    kb.add(KeyboardButton("Технологии"))
+    return kb
+
+
+# --- Кнопка "назад в главное меню" ---
+def back_to_main_keyboard():
+    kb = ReplyKeyboardMarkup(resize_keyboard=True)
+    kb.add(KeyboardButton("Назад в главное меню"))
+    return kb
+
+
+# --- /start ---
+@dp.message_handler(commands=['start'])
 async def cmd_start(message: types.Message):
+    await message.answer("Выберите категорию новостей:",
+                         reply_markup=main_menu_keyboard())
+
+
+# --- Выбор категории ---
+@dp.message_handler(
+    lambda message: message.text in ["Игры", "IT", "Наука", "Технологии"])
+async def category_chosen(message: types.Message):
+    category = message.text
+    kb = ReplyKeyboardMarkup(resize_keyboard=True)
+
+    if category == "Игры":
+        kb.add(KeyboardButton("StopGame"))
+        kb.add(KeyboardButton("Igromania"))
+        kb.add(KeyboardButton("3DNews"))
+    elif category == "IT":
+        kb.add(KeyboardButton("Habr"))
+        kb.add(KeyboardButton("TechCrunch"))
+        kb.add(KeyboardButton("The Verge"))
+    elif category == "Наука":
+        kb.add(KeyboardButton("HackerNews"))
+    elif category == "Технологии":
+        kb.add(KeyboardButton("TechCrunch"))
+        kb.add(KeyboardButton("Slashdot"))
+        kb.add(KeyboardButton("The Verge"))
+
+    # Добавляем кнопку "назад в главное меню"
+    kb.add(KeyboardButton("Назад в главное меню"))
+
+    await message.answer(f"Вы выбрали {category}. Теперь выберите источник:",
+                         reply_markup=kb)
+
+
+# --- Назад в главное меню ---
+@dp.message_handler(lambda message: message.text == "Назад в главное меню")
+async def back_to_main(message: types.Message):
     await message.answer(
-        "ITNewsHubBot запущен.\n"
-        "Команда /news — последние IT-новости."
-    )
+        "Вы вернулись в главное меню. Выберите категорию новостей:",
+        reply_markup=main_menu_keyboard())
 
 
-@dp.message_handler(commands=["news"])
-async def cmd_news(message: types.Message):
-    news_list = get_all_news(limit=5)
+# --- Выбор источника ---
+@dp.message_handler(lambda message: message.text in [
+    "StopGame", "Igromania", "3DNews", "Habr", "TechCrunch", "The Verge",
+    "HackerNews", "Slashdot"
+])
+async def source_chosen(message: types.Message):
+    source = message.text
+
+    # Получаем новости по источнику
+    if source == "StopGame":
+        news_list = get_stopgame_news()
+    elif source == "Igromania":
+        news_list = get_igromania_news()
+    elif source == "3DNews":
+        news_list = get_3dnews_news()
+    elif source == "Habr":
+        news_list = get_habr_news()
+    elif source == "TechCrunch":
+        news_list = get_techcrunch_news()
+    elif source == "The Verge":
+        news_list = get_theverge_news()
+    elif source == "HackerNews":
+        news_list = get_hackernews()
+    elif source == "Slashdot":
+        news_list = get_slashdot_news()
+    else:
+        news_list = []
 
     if not news_list:
         await message.answer("Не удалось получить новости.")
         return
 
-    for item in news_list:
-        await message.answer(item)
+    user_data[message.from_user.id] = {"news": news_list, "index": 0}
+
+    news_item = news_list[0]
+    kb = InlineKeyboardMarkup()
+    kb.add(InlineKeyboardButton("Следующая новость",
+                                callback_data="next_news"))
+
+    text = f"{news_item['title']}\n\n{news_item['summary']}\n{news_item['link']}"
+    await message.answer(text, reply_markup=kb)
+
+
+# --- Callback для следующей новости ---
+@dp.callback_query_handler(lambda c: c.data == "next_news")
+async def next_news(callback_query: types.CallbackQuery):
+    user_id = callback_query.from_user.id
+    data = user_data.get(user_id)
+    if not data:
+        await callback_query.answer(
+            "Новости не найдены. Сначала выберите источник.")
+        return
+
+    data['index'] += 1
+    if data['index'] >= len(data['news']):
+        await callback_query.answer("Больше новостей нет.")
+        return
+
+    news_item = data['news'][data['index']]
+    kb = InlineKeyboardMarkup()
+    kb.add(InlineKeyboardButton("Следующая новость",
+                                callback_data="next_news"))
+
+    text = f"{news_item['title']}\n\n{news_item['summary']}\n{news_item['link']}"
+    await callback_query.message.edit_text(text, reply_markup=kb)
 
 
 if __name__ == "__main__":
