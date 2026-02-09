@@ -209,4 +209,201 @@ def get_igromania_news():
         logging.error(f"Ошибка Igromania: {e}")
         return []
 
+# --- Shazoo ---
+def get_shazoo_news():
+    try:
+        feed = feedparser.parse("https://shazoo.ru/feed/")
+        result = []
+        for entry in feed.entries[:5]:
+            soup = BeautifulSoup(entry.get("summary", ""), "html.parser")
+            img = soup.find("img")
+            result.append({
+                "title": entry.title,
+                "summary": get_summary(soup.get_text()),
+                "link": entry.link,
+                "image": img["src"] if img else None
+            })
+        return result
+    except Exception as e:
+        logging.error(f"Ошибка Shazoo: {e}")
+        return []
+
+# --- Playground ---
+def get_playground_news():
+    try:
+        feed = feedparser.parse("https://playground.ru/rss/news.xml")
+        result = []
+        for entry in feed.entries[:5]:
+            soup = BeautifulSoup(entry.get("summary", ""), "html.parser")
+            img = soup.find("img")
+            result.append({
+                "title": entry.title,
+                "summary": get_summary(soup.get_text()),
+                "link": entry.link,
+                "image": img["src"] if img else None
+            })
+        return result
+    except Exception as e:
+        logging.error(f"Ошибка Playground: {e}")
+        return []
+
+# --- PravilaMag ---
+def get_pravilamag_news():
+    try:
+        feed = feedparser.parse("https://www.pravilamag.ru/rss/")
+        result = []
+        for entry in feed.entries[:5]:
+            soup = BeautifulSoup(entry.get("summary", ""), "html.parser")
+            img = soup.find("img")
+            result.append({
+                "title": entry.title,
+                "summary": get_summary(soup.get_text()),
+                "link": entry.link,
+                "image": img["src"] if img else None
+            })
+        return result
+    except Exception as e:
+        logging.error(f"Ошибка PravilaMag: {e}")
+        return []
+
+# --- KinoPoisk ---
+def get_kinopoisk_news():
+    try:
+        feed = feedparser.parse("https://www.kinopoisk.ru/news/rss/")
+        result = []
+        for entry in feed.entries[:5]:
+            summary_html = entry.get("summary", "")
+            soup = BeautifulSoup(summary_html, "html.parser")
+            img = soup.find("img")
+            result.append({
+                "title": entry.title,
+                "summary": get_summary(soup.get_text()),
+                "link": entry.link,
+                "image": img["src"] if img else None
+            })
+        return result
+    except Exception as e:
+        logging.error(f"Ошибка KinoPoisk: {e}")
+        return []
+
+# --- DTF ---
+def get_dtf_news():
+    try:
+        feed = feedparser.parse("https://dtf.ru/rss")
+        result = []
+        for entry in feed.entries[:5]:
+            summary_html = entry.get("summary", "")
+            soup = BeautifulSoup(summary_html, "html.parser")
+            img = soup.find("img")
+            result.append({
+                "title": entry.title,
+                "summary": get_summary(soup.get_text()),
+                "link": entry.link,
+                "image": img["src"] if img else None
+            })
+        return result
+    except Exception as e:
+        logging.error(f"Ошибка DTF: {e}")
+        return []
+
+# --- NoFilmSchool ---
+def get_nofilmschool_news():
+    try:
+        feed = feedparser.parse("https://nofilmschool.com/feed")
+        result = []
+        for entry in feed.entries[:5]:
+            summary_html = entry.get("summary", "")
+            soup = BeautifulSoup(summary_html, "html.parser")
+            img = soup.find("img")
+            result.append({
+                "title": entry.title,
+                "summary": get_summary(soup.get_text()),
+                "link": entry.link,
+                "image": img["src"] if img else None
+            })
+        return result
+    except Exception as e:
+        logging.error(f"Ошибка NoFilmSchool: {e}")
+        return []
+
+# --- Pitchfork ---
+def get_pitchfork_news():
+    try:
+        feed = feedparser.parse("https://pitchfork.com/feed/")
+        result = []
+        for entry in feed.entries[:5]:
+            summary_html = entry.get("summary", "")
+            soup = BeautifulSoup(summary_html, "html.parser")
+            img = soup.find("img")
+            result.append({
+                "title": entry.title,
+                "summary": get_summary(soup.get_text()),
+                "link": entry.link,
+                "image": img["src"] if img else None
+            })
+        return result
+    except Exception as e:
+        logging.error(f"Ошибка Pitchfork: {e}")
+        return []
+
+# --- The Quietus ---
+def get_thequietus_news():
+    try:
+        feed = feedparser.parse("https://thequietus.com/rss")
+        result = []
+        for entry in feed.entries[:5]:
+            summary_html = entry.get("summary", "")
+            soup = BeautifulSoup(summary_html, "html.parser")
+            img = soup.find("img")
+            result.append({
+                "title": entry.title,
+                "summary": get_summary(soup.get_text()),
+                "link": entry.link,
+                "image": img["src"] if img else None
+            })
+        return result
+    except Exception as e:
+        logging.error(f"Ошибка The Quietus: {e}")
+        return []
+
+# --- Aeon ---
+def get_aeon_news():
+    try:
+        feed = feedparser.parse("https://aeon.co/feed")
+        result = []
+        for entry in feed.entries[:5]:
+            summary_html = entry.get("summary", "")
+            soup = BeautifulSoup(summary_html, "html.parser")
+            img = soup.find("img")
+            result.append({
+                "title": entry.title,
+                "summary": get_summary(soup.get_text()),
+                "link": entry.link,
+                "image": img["src"] if img else None
+            })
+        return result
+    except Exception as e:
+        logging.error(f"Ошибка Aeon: {e}")
+        return []
+
+# --- Nautilus ---
+def get_nautilus_news():
+    try:
+        feed = feedparser.parse("https://nautil.us/feed")
+        result = []
+        for entry in feed.entries[:5]:
+            summary_html = entry.get("summary", "")
+            soup = BeautifulSoup(summary_html, "html.parser")
+            img = soup.find("img")
+            result.append({
+                "title": entry.title,
+                "summary": get_summary(soup.get_text()),
+                "link": entry.link,
+                "image": img["src"] if img else None
+            })
+        return result
+    except Exception as e:
+        logging.error(f"Ошибка Nautilus: {e}")
+        return []
+
 
