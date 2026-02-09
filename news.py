@@ -5,17 +5,30 @@ import requests
 from bs4 import BeautifulSoup
 
 FEED_TIMEOUT = 10
+DEFAULT_HEADERS = {
+    "User-Agent":
+    "Mozilla/5.0 (compatible; ITNewsHubBot/1.0; +https://example.com/bot)",
+    "Accept":
+    "application/rss+xml, application/xml;q=0.9, text/xml;q=0.8, */*;q=0.5",
+}
 
 
-def fetch_feed(url, source_name):
+def fetch_feed(url, source_name, headers=None, relaxed=False):
+    request_headers = headers or {}
     try:
-        response = requests.get(url, timeout=FEED_TIMEOUT)
+        response = requests.get(url,
+                                timeout=FEED_TIMEOUT,
+                                headers=request_headers)
         response.raise_for_status()
     except requests.RequestException as exc:
         logging.error(f"Ошибка {source_name}: {exc}")
         return None
 
-    feed = feedparser.parse(response.content)
+    parse_kwargs = {}
+    if relaxed:
+        parse_kwargs["sanitize_html"] = True
+
+    feed = feedparser.parse(response.content, **parse_kwargs)
     if feed.bozo and getattr(feed, "bozo_exception", None):
         logging.error(f"Ошибка {source_name}: {feed.bozo_exception}")
         return None
@@ -32,7 +45,9 @@ def get_summary(text, max_len=300):
 
 # --- 3DNews ---
 def get_3dnews_news():
-    feed = fetch_feed("https://3dnews.ru/news/rss/", "3DNews")
+    feed = fetch_feed("https://3dnews.ru/news/rss/",
+                      "3DNews",
+                      relaxed=True)
     if not feed:
         return []
 
@@ -102,7 +117,9 @@ def get_hackernews():
 
 # --- The Verge ---
 def get_theverge_news():
-    feed = fetch_feed("https://www.theverge.com/rss/index.xml", "The Verge")
+    feed = fetch_feed("https://www.theverge.com/rss/index.xml",
+                      "The Verge",
+                      headers=DEFAULT_HEADERS)
     if not feed:
         return []
 
@@ -120,6 +137,7 @@ def get_theverge_news():
         except Exception as exc:
             logging.error(f"Ошибка The Verge (entry): {exc}")
     return result
+
 
 
 # --- TechCrunch ---
@@ -243,5 +261,6 @@ def get_igromania_news():
         except Exception as exc:
             logging.error(f"Ошибка Igromania (entry): {exc}")
     return result
+
 
 
