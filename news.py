@@ -96,10 +96,13 @@ def get_theverge_news():
 # --- TechCrunch ---
 def get_techcrunch_news():
     try:
-        feed = feedparser.parse("http://feeds.feedburner.com/TechCrunch/")
+        feed = feedparser.parse("https://techcrunch.com/feed/")
         result = []
         for entry in feed.entries[:5]:
-            soup = BeautifulSoup(entry.get("summary", ""), "html.parser")
+            summary_html = entry.get("summary", "")
+            if not summary_html and entry.get("content"):
+                summary_html = entry.get("content")[0].get("value", "")
+            soup = BeautifulSoup(summary_html, "html.parser")
             img = soup.find("img")
             result.append({
                 "title": entry.title,
@@ -205,4 +208,5 @@ def get_igromania_news():
     except Exception as e:
         logging.error(f"Ошибка Igromania: {e}")
         return []
+
 
