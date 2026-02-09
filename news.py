@@ -168,12 +168,12 @@ def get_slashdot_news():
 
 
 # --- StopGame ---
-def get_stopgame_news():␊
-    try:␊
-        url = "https://stopgame.ru/news"␊
+def get_stopgame_news(): 
+    try: 
+        url = "https://stopgame.ru/news" 
         resp = requests.get(url, timeout=FEED_TIMEOUT)
-        resp.raise_for_status()␊
-        soup = BeautifulSoup(resp.text, "html.parser")␊
+        resp.raise_for_status() 
+        soup = BeautifulSoup(resp.text, "html.parser") 
 
         news_items = soup.find_all("article", class_="_card_1lcny_4")
         results = []
@@ -243,4 +243,5 @@ def get_igromania_news():
         except Exception as exc:
             logging.error(f"Ошибка Igromania (entry): {exc}")
     return result
+
 
