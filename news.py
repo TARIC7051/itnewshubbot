@@ -70,7 +70,6 @@ def get_3dnews_news():
     return result
 
 
-
 # --- Habr ---
 def get_habr_news():
     feed = fetch_feed("https://habr.com/ru/rss/all/all/?fl=ru", "Habr")
@@ -94,7 +93,6 @@ def get_habr_news():
     return result
 
 
-
 # --- HackerNews ---
 def get_hackernews():
     feed = fetch_feed("https://news.ycombinator.com/rss", "HackerNews")
@@ -113,6 +111,7 @@ def get_hackernews():
         except Exception as exc:
             logging.error(f"Ошибка HackerNews (entry): {exc}")
     return result
+
 
 # --- The Verge ---
 def get_theverge_news():
@@ -136,7 +135,6 @@ def get_theverge_news():
         except Exception as exc:
             logging.error(f"Ошибка The Verge (entry): {exc}")
     return result
-
 
 
 # --- TechCrunch ---
@@ -187,11 +185,11 @@ def get_slashdot_news():
 
 # --- StopGame ---
 def get_stopgame_news():
-    try:␊
+    try:
         url = "https://stopgame.ru/news"
         resp = requests.get(url, timeout=FEED_TIMEOUT)
         resp.raise_for_status()
-        soup = BeautifulSoup(resp.text, "html.parser") 
+        soup = BeautifulSoup(resp.text, "html.parser")
 
         news_items = soup.find_all("article", class_="_card_1lcny_4")
         results = []
@@ -261,8 +259,3 @@ def get_igromania_news():
         except Exception as exc:
             logging.error(f"Ошибка Igromania (entry): {exc}")
     return result
-
-
-
-
-
