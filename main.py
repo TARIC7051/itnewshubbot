@@ -3,9 +3,15 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.utils import executor
 from config import API_TOKEN
-from news import (get_3dnews_news, get_habr_news, get_hackernews,
-                  get_theverge_news, get_techcrunch_news, get_slashdot_news,
-                  get_stopgame_news, get_igromania_news)
+from news import (
+    get_3dnews_news, get_habr_news, get_hackernews,
+    get_theverge_news, get_techcrunch_news, get_slashdot_news,
+    get_stopgame_news, get_igromania_news,
+    get_shazoo_news, get_playground_news, get_pravilamag_news,
+    get_kinopoisk_news, get_dtf_news, get_nofilmschool_news,
+    get_pitchfork_news, get_thequietus_news, get_aeon_news,
+    get_nautilus_news
+)
 
 logging.basicConfig(level=logging.INFO)
 
@@ -145,3 +151,4 @@ async def next_news(callback_query: types.CallbackQuery):
 
 if __name__ == "__main__":
     executor.start_polling(dp, skip_updates=True)
+
