@@ -186,7 +186,7 @@ def get_slashdot_news():
 
 
 # --- StopGame ---
-def get_stopgame_news():␊
+def get_stopgame_news():
     try:␊
         url = "https://stopgame.ru/news"
         resp = requests.get(url, timeout=FEED_TIMEOUT)
@@ -261,6 +261,7 @@ def get_igromania_news():
         except Exception as exc:
             logging.error(f"Ошибка Igromania (entry): {exc}")
     return result
+
 
 
 
